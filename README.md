@@ -1,35 +1,89 @@
-# 去my.telegram.org获取api_id api_hash千万不要点错成delete账户！！！！
-#### 刚开始学习使用GITHUB，我是一个菜鸟
-#### 同样的也是刚开始学习PYTHON
-#### 尝试使用python写一个基于E大的dockerV3的机器人交互
-***
-- BUG漫天飞
-- MAIKA永相随
-***
-- 使用方法：
-    - 将bot.py、bot.json、rebot.sh放入/jd/config文件夹下
-    - 在docker内执行`apk add python3`
-    - 如需扫码获取cookie 需执行`apk add zlib-dev gcc jpeg-dev python3-dev musl-dev`
-    - 由于需要安装多个依赖包，建议将清华源设置为默认源`pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple`
-    - 执行`pip3 install telethon python-socks[asyncio] pillow qrcode requests`
-    - rebot.sh 用于杀死原bot进程，后台启动新进程，建议直接环境搭建好后直接 `bash /jd/config/rebot.sh`
-    - 如果需要更换机器人token，需要将bot.session删除后，重新运行`bash /jd/config/rebot.sh`
-***
-- 主要实现功能：
-    - /start 开始使用本程序
-    - /help 查看使用帮助
-    - /bash 执行bash程序，如git_pull、diy及可执行自定义.sh，例如/bash /jd/config/abcd.sh
-    - /node 执行js脚本文件，目前仅支持/scirpts、/config目录下js，直接输入/node jd_bean_change 即可进行执行。该命令会等待脚本执行完，期间不能使用机器人，建议使用snode命令。
-    - /cmd 执行cmd命令,例如/cmd python3 /python/bot.py 则将执行python目录下的bot.py
-    - /snode 命令可以选择脚本执行，只能选择/jd/scripts目录下的脚本，选择完后直接后台运行，不影响机器人响应其他命令
-    - /log 选择查看执行日志
-    - /getfile 获取/jd目录下文件
-    - /getcookie 扫码获取cookie
-    - 此外直接发送文件，会让你选择保存到哪个文件夹，如果选择运行，将保存至scripts或者own目录下，并立即运行脚本
-    - crontab.list文件会自动更新时间'''
-- todo:
-    - ~~snode忽略非js文件，由于tg最大支持100个按钮，需要进行排除非js文件~~ 已完成
-    - ~~V4更新了，还没来得及看，后期新增~~ V4版本已更新
-    - ~~扫码获取cookie~~ 采用lof大佬方案
-    - 一键生成提交互助码格式 某些原因，不更新该功能（对 就是因为我太菜了）
-    - 因为我还在用v3版本，v4升级的地方有哪些也没来得及研究，有错误请留言，有需要增加功能的，我可以尝试写
+安装BOT
+申请API_ID及API_HASH
+打开 my.telegram.org
+登录
+创建API
+![image](https://user-images.githubusercontent.com/44235578/114650410-c847fd80-9d14-11eb-8539-53420e97f132.png)
+
+API名称
+![image](https://user-images.githubusercontent.com/44235578/114650379-bebe9580-9d14-11eb-9312-4f23a9962335.png)
+
+创建好的API如下
+![image](https://user-images.githubusercontent.com/44235578/114650433-d138cf00-9d14-11eb-9310-85b3cc2e6bb1.png)
+
+下载文件
+必要文件：
+
+ - bot.json       //【必须】配置文件
+ - bot.py         //【必须】v4版docker，用botV4.py
+ - rebot.sh       //【必须】v4版docker，用rebotV4.sh
+ - shortcut.list  //【可选】自定义按钮
+文件下载：下载地址
+
+修改bot.json文件
+将bot.json文件修改为如下格式，注意红框部分无引号项。
+![image](https://user-images.githubusercontent.com/44235578/114650448-d72eb000-9d14-11eb-998c-ff2d8ef0bbee.png)
+
+上传修改文件
+V3上传修改后的bot.json、bot.py和rebot.sh文件上传至容器内的/jd/config文件夹。
+V4上传修改后的bot.json、botV4.py和rebotV4.sh文件上传至容器内的/jd/config文件夹。
+进入容器
+docker exec -it 容器名 bash
+安装python环境
+安装python3及pip
+apk update
+apk add python3
+apk add py2-pip
+注意：【可选操作】网络较差时，可以尝试切换至清华源安装依赖，命令如下：
+
+pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+或
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+安装依赖及模块
+方法一：适合懒人
+下载requirements.txt文件
+wget https://raw.githubusercontent.com/SuMaiKaDe/jddockerbot/master/requirements.txt
+安装依赖及模块
+pip3 install -r requirements.txt
+或
+pip install -r requirements.txt
+注意：当遇到缺模块或模块版本不匹配问题，使用方法二手动补充所缺模块
+
+方法二：适合勤快人
+安装依赖
+apk add zlib-dev gcc jpeg-dev python3-dev musl-dev
+安装模块
+pip install --upgrade pip
+pip install requests telethon python-socks[asyncio] pillow qrcode
+注意：命令行中黄色字为警告，红色字表示报错。如果pip install，遇到报错【红色字】，可以尝试如下命令：
+
+pip3 install requests telethon python-socks[asyncio] pillow qrcode
+运行BOT机器人
+V4版本
+
+python3 botV4.py
+V3版本
+
+python3 bot.py
+docker后台运行机器人
+V4版本
+bash rebotV4.sh
+V3版本
+bash rebot.sh
+设置容器启动自动运行BOT
+将命令添加到diy.sh
+
+V4版本
+bash /jd/config/rebotV4.sh
+V3版本
+bash /jd/config/rebot.sh
+进阶教程
+使用自定义按钮
+在/jd/config文件夹，创建 shortcut.list 文件
+修改 shortcut.list，添加自定义按钮，格式如下：
+更新脚本-->jup
+京豆通知-->jtask jd_bean_change
+解析：
+
+中文为 按钮名称
+-->后 红字为 按钮命令
